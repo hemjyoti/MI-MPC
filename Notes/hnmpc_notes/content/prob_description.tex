@@ -1,0 +1,19 @@
+\textcolor{red}{AF: one thing is the problem and a different one is the solution, this section seems to talk about the solution, not the problem. A section about the problem should be added,}
+
+\textcolor{red}{AF: a block diagram must be added and referred to.}
+
+\begin{figure*}
+	\centering
+	\includegraphics[width=1.0\textwidth]{figure/block_diagram}
+\end{figure*}
+
+The base controller of this work is a zone NMPC with trajectory-dependent penalty parameters. The zone NMPC model takes into account the robot dynamics plus part of the robot dynamics that the human is able to control, e.g. attitude and height \textcolor{red}{AF: to be checked}). The controller is driven by the predicted trajectories from another NMPC (namely, low-level NMPC), which considers just the dynamics of the robot. At each time instant, two constrained optimization problems are solved numerically, yielding two different feedback control policies.
+
+In this section, we present the respective prediction models for each NMPC, as well as the nonlinear programs (NLP) arising in each NMPC formulation. 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Prediction Models}
+\input{content/predic_models}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Nonlinear Programs}
+\input{content/nlps}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

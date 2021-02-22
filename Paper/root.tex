@@ -1,0 +1,176 @@
+\newif\ifRAL
+% Comment one of the following lines
+\RALtrue 	% RAL PAPER
+%\RALfalse 	% ICRA PAPER
+
+\newif\ifTR
+% Comment one of the following lines
+%\TRtrue 	% Tech report in
+\TRfalse 	% Tech report not in
+
+\newif\ifPrePrint
+%\PrePrinttrue
+\PrePrintfalse
+
+\ifRAL
+  \documentclass[letterpaper, 10 pt, journal, twoside]{IEEEtran}
+\else
+  \documentclass[letterpaper, 10 pt, conference]{ieeeconf}
+\fi
+
+% This command is only
+% needed if you want to
+% use the \thanks command
+\IEEEoverridecommandlockouts
+
+\ifRAL
+	% \overrideIEEEmargins
+	% Comment this command for final RAL version.
+	% Use this command for initial and revised RAL versions, and for final conference version
+\else
+% See the \addtolength command later in the file to balance the column lengths
+% on the last page of the document
+	\overrideIEEEmargins
+	\def\baselinestretch{0.99}
+\fi		
+
+
+% save and then undefine the offending command
+% we need \makeatletter because \@undefined uses the special @ character.
+\makeatletter
+\let\IEEEproof\proof
+\let\IEEEendproof\endproof
+\let\proof\@undefined
+\let\endproof\@undefined
+\makeatother
+
+
+
+
+% See the \addtolength command later in the file to balance the column lengths
+% on the last page of the document
+\usepackage{scrextend}
+\usepackage[hidelinks]{hyperref}
+\usepackage{graphicx}   % for pdf, bitmapped graphics files
+\usepackage{epsfig}    % for postscript graphics files
+\usepackage{amsmath}    % assumes amsmath package installed
+\usepackage{amssymb}    % assumes amsmath package installed
+\usepackage{mathtools}  % assumes amsmath package installed
+\usepackage{float}
+\usepackage{booktabs,tabularx}
+\usepackage[caption=false]{subfig}
+% for compact citation of multiple authors
+\usepackage{cite}
+\usepackage{accents}
+% for blank spaces
+\usepackage{blindtext}
+\usepackage{xcolor}
+ % used for the two-column index
+\usepackage{multicol}       
+\usepackage{booktabs,tabularx}
+\usepackage{multirow}
+\usepackage{accents}
+\newcommand{\ubar}[1]{\underaccent{\bar}{#1}}
+
+\let\proof\relax
+\let\endproof\relax
+\usepackage{amsthm}
+\newtheorem{definition}{Definition}
+\newtheorem{problem}{Problem}
+\newtheorem{remark}{Remark}
+\newtheorem{note}{Note}
+\newtheorem{assumption}{Assumption}
+
+\usepackage{multicol}
+\usepackage{xcolor}
+%% general definitions
+\newcommand\AF[1]{{\textcolor{red}{AF:#1}}}
+
+
+\let\labelindent\relax
+\let\labelindent\relax
+\usepackage{enumitem}
+\newcommand{\subscript}[2]{$#1 _ #2$}
+
+\DeclareMathOperator{\atantwo}{atan2}
+\DeclareMathOperator{\asin}{asin}
+
+
+
+% \\\\\\\ Title \\\\\\
+\ifRAL % RAL
+	\title{ Towards Safe Human-Quadrotor Interaction: Mixed-Initiative Control Algorithm Using Real-Time NMPC}
+
+\else % ICRA
+	\title{\bf Towards Safe Human-Quadrotor Interaction: Mixed-Initiative Control Based on Real-Time NMPC}
+\fi
+
+
+
+\author{B\'arbara Barros Carlos$^{1}$, Antonio Franchi$^{2}$ and Giuseppe Oriolo$^{1}$% <-this % stops a space
+%\thanks{*This work was not supported by any organization}% <-this % stops a space
+\thanks{$^{1}$B. B. Carlos and G. Oriolo are with the Department of Computer, Control \& Management Engineering (DIAG), Sapienza Universit\`a di Roma, Italy.
+        {\tt\footnotesize \{barros, oriolo\}@diag.uniroma1.it}}%
+\thanks{$^{2}$A. Franchi is with the University of Twente, 
+Faculty of Electrical Engineering, Mathematics \& Computer Science,  Robotics and Mechatronics Laboratory, The Netherlands and also with LAAS-CNRS, CNRS, Universit\'e de Toulouse, France
+        {\tt\footnotesize a.franchi@utwente.nl}}%
+\thanks{This work is partially funded by the European Commission project H2020 AERIAL-CORE (EC 871479).}%
+}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+\pagestyle{empty}
+
+%===============================================================================
+\begin{abstract}
+This paper presents a novel algorithm for blending human inputs and motion generator commands, guaranteeing safety in mixed-initiative interactions between humans and quadrotors. The algorithm is based on nonlinear model predictive control (NMPC) and involves using the state solution to assess whether safety- and/or task-related rules are met to mix control authority. The mixing is attained through the convex combination of human and actual robot costs, driven by a continuous function that measures the violation of the rules. To achieve real-time feasibility, we rely on an efficient real-time iteration (RTI) variant of a sequential quadratic programming (SQP) scheme to cast the mixed-initiative controller. We demonstrate the effectiveness of our algorithm through numerical simulations, where a second autonomous algorithm is used to emulate the behavior of pilots with different competence levels. Simulations show that our scheme provides suitable assistance to pilots, especially novices, in a workspace with obstacles while underpinning computational efficiency. 
+\end{abstract}
+%===============================================================================
+\section{INTRODUCTION}
+\input{content/intro}
+\subsection{Related works}
+\input{content/related_works}
+\subsection{Contributions and paper structure}
+\input{content/contribution}
+\subsection{Notation}
+\input{content/notation}
+%===============================================================================
+\section{PROBLEM STATEMENT}\label{sec:problem_statement}
+\input{content/problem_statement}
+%===============================================================================
+\section{MIXED-INITIATIVE CONTROL}\label{sec:algo_details}
+\input{content/overview}
+\subsection{Mixed-initiative controller}\label{subsec:nlps}
+\input{content/nlps}
+\subsection{Working conditions}
+\input{content/working_conditions}
+\subsection{Predicted healthiness index}
+\input{content/ph_index}
+%===============================================================================
+\section{NUMERICAL RESULTS AND DISCUSSION}\label{sec:numerical_results}
+\input{content/sim}
+\subsection{Implementation details}
+\subsubsection{NMPC via real-time iteration scheme}
+\input{content/rti}
+\subsubsection{Structure-exploiting QP solver and condensing approach}
+\input{content/qp_solver}
+\subsection{Performance analysis}
+\input{content/analysis1}
+
+%\subsection{Performance analysis}
+%\input{content/performance}
+%\subsection{Stability}
+%\input{content/stability}
+\subsection{Computational burden}
+\input{content/computational_burden}
+%===============================================================================
+\section{CONCLUSIONS}\label{sec:conclusion}
+\input{content/conclusion}
+%\addtolength{\textheight}{-12cm}  
+%===============================================================================
+\bibliographystyle{IEEEtran}
+\bibliography{biblio}
+%===============================================================================
+\end{document}

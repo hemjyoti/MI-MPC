@@ -1,0 +1,9 @@
+As previously hypothesized, pilots would typically perform continuous maneuvers by changing their inputs all the time. To preserve smoothness in the generated trajectory, we consider additional penalty terms in the MI controller cost function. These terms rely on the following output functions:
+\begin{equation}
+	h(\xi_i) = h(\xi_N) = (\psi; v_b; \omega) \in \mathbb{R}^7
+\end{equation}
+and their corresponding references
+\begin{equation}
+	e_i = e_N = \mathbf{0_7}.
+\end{equation}
+The vector of zeros implies two underlying assumptions: first, we are not dealing with aggressive maneuvers; second, we assume it is an educated guess to initialize and, thereby, speed-up the subsequent optimization algorithm.

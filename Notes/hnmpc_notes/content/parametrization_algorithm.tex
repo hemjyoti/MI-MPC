@@ -1,0 +1,35 @@
+To what concerns the parametrization of both NLPs, we assume a sampling time of $t_s = 15$ ms, and $N=50$ shooting nodes. The values of the parameters appearing in the model are listed in Table \ref{tab:prm}. Constraints for this system include bounds on speed $\ubar{\Omega} = 0$, $\Bar{\Omega} = 0.09$ kHz, and control $\ubar{u} = 0$, $\Bar{u} =  0.1285$ kNm. The weight matrices of the low-level NMPC are
+\begin{equation*}
+\begin{aligned}
+	W & = \text{blkdiag}(250\cdot\mathbf{I_2},300, 30\cdot\mathbf{I_3},5\cdot\mathbf{I_6},30\cdot\mathbf{I_4},70\cdot\mathbf{I_4}), \\
+	W_N & = \text{blkdiag}(250\cdot\mathbf{I_2},300, 30\cdot\mathbf{I_3},5\cdot\mathbf{I_6},30\cdot\mathbf{I_4}).
+\end{aligned}
+\end{equation*}
+Similarly, the weight matrices for the initial setting of the zone NMPC are
+\begin{equation*}
+\begin{aligned}
+		W_R & = \text{blkdiag}(250\cdot\mathbf{I_2},300, 30\cdot\mathbf{I_3},5\cdot\mathbf{I_6},30\cdot\mathbf{I_4}),\\
+		W_H & = \text{blkdiag}(30\cdot\mathbf{I_3},5\cdot\mathbf{I_3},30\cdot\mathbf{I_4}),\\
+		W_C & = 70\cdot\mathbf{I_4}.
+\end{aligned}
+\end{equation*}
+Notice that the weights assigned to the human contribution have the same values as their corresponding part in the robot contribution (i.e. Euler angles, angular rates and speed of the propellers). This is done in order to preserve equality of modulation-range.  
+
+Finally, the maximum deformation conceded to the human with respect to the reference of the robot is $a \vcentcolon = (0.05,0.05,0.1)$ m, causing the bounds on the target zone to be $\check{\epsilon}=0, \Hat{\epsilon} = 0.122$ m.
+
+\begin{table}[h]
+\caption{Quadrotor model - values of the parameter used for the simulation results in this section.}\label{tab:prm}
+\begin{tabular}{ccc}
+\hline
+\textbf{Parameter} & \textbf{Value}                                  & \textbf{Description}                               \\ \hline
+$g$       & 9.8066 m/s$^2$                         & gravitational acceleration                \\ \hline
+$m$       & 1.04 kg                                & total mass                                \\ \hline
+$l$       & 0.23 m                               & arm length    \\ \hline
+$J_{xx}$    & $0.010$ kg $\cdot$ m$^2$ & inertia moment around x \\ \hline
+$J_{yy}$    & $0.010$ kg $\cdot$ m$^2$ & inertia moment around y \\ \hline
+$J_{zz}$    & $0.070$ kg $\cdot$ m$^2$ & inertia moment around z \\ \hline
+$C_D$     & $10.0$ Nm/kHz     & drag coefficient                          \\ \hline
+$C_T$     & $595.0$ N/kHz        & thrust coefficient                        \\ \hline
+$J_m$	  & $0.8$ kg $\cdot$ m$^2$ & rotor inertia \\ \hline
+\end{tabular}
+\end{table}

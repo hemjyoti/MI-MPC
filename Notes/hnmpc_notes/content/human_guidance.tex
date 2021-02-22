@@ -1,0 +1,21 @@
+We simulate human actions by means of a reactive controller. Different levels of piloting skills are achieved through three different sets of gain matrices, which significantly improve the tracking performance of the controller. We regard the following control law:
+\begin{equation}
+\begin{aligned}
+	\mathcal{U}_1 &= \mathbf{f}^T_d\mathbf{R}_d\mathbf{1_z}\\
+	\mathcal{U}_2 &= - \mathbf{K}_R\mathbf{e}_R - \mathbf{K}_{\omega}\mathbf{e}_{\omega} \end{aligned}\label{eq:control_law}%
+\end{equation}
+with the respective position, velocity, rotation and angular velocity errors
+\begin{equation*}
+\begin{aligned}
+	\mathbf{e}_p = p - p^d, \quad \mathbf{e}_v = \Dot{p}-\Dot{p}^d, \quad  \mathbf{e}_R = \frac{1}{2}(\mathbf{R}^T_d\mathbf{R}-\mathbf{R}\mathbf{R}_d)^\vee, \quad \mathbf{e}_{\omega} = \omega - \mathbf{R}\mathbf{R}^T_d\omega^d,
+\end{aligned}
+\end{equation*}
+and the following vector
+\begin{equation*}
+	\mathbf{f}_d = mg\mathbf{1_z} - \mathbf{K}_p\mathbf{e}_p - \mathbf{K}_{v}\mathbf{e}_{v}  -\mathbf{K}_I \int_{t_0}^{t_s}\mathbf{e}_p d\tau,
+\end{equation*}
+where $\bullet^\vee \vcentcolon SO(3) \rightarrow \mathbb{R}^3$ is the the \emph{vee} operator, and $\mathbf{R} \in SO(3)$ represents the rotation matrix from $\{\mathcal{B}\}$ to $\{\mathcal{I}\}$. The reference attitude trajectory is denoted by $\mathbf{R}_d \in SO(3)$, while $\mathbf{K}_p, \mathbf{K}_v, \mathbf{K}_I, \mathbf{K}_R$ and $\mathbf{K}_{\omega}$ are positive definite gain matrices.
+
+The control law in \eqref{eq:control_law} provides the nominal input required to track the full-pose trajectory $q = (p^d, R_d) \vcentcolon [t_0,t_f]\rightarrow SE(3)$, retrieved from the global reference. The matrix $\mathbf{R}_d$ and the nominal input can be transformed into desired attitude and speed of the propellers (see Appendix \ref{ap:human_commands}), which are passed to (\textbf {NLP$_2$}) as a reference trajectory. In this way, as long as the adaptive criterion is met, the human inputs will retain the control authority and modify the reference tracked by the robot.
+
+The levels of piloting skills considered are inexperienced (\textbf{L0}), intermediate (\textbf{L1}) and experienced (\textbf{L2}).

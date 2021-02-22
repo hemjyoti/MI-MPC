@@ -1,0 +1,43 @@
+Let us denote with $\{\mathcal{I}\}$ the inertial frame, and with $\{\mathcal{B}\}$ the body frame located at the center of mass (CoM) of the aerial vehicle. Consider a quadrotor with position $p = (x, y, z) \in \mathbb{R}^3$ expressed in $\{\mathcal{I}\}$, orientation $ \gamma = (\phi,\theta,\psi) \in \mathbb{R}^3$, linear velocity $v_b = (v_x, v_y, v_z) \in \mathbb{R}^3$ expressed in $\{\mathcal{B}\}$, angular rate $\omega = (\omega_x, \omega_y, \omega_z) \in \mathbb{R}^3$ expressed in $\{\mathcal{B}\}$ and rotational speed of the propellers $\Omega = (\Omega_1,\Omega_2,\Omega_3,\Omega_4) \in \mathbb{R}^4$, bounded by $\mathcal{X} = \{\Omega \in \mathbb{R}^4 \vcentcolon \ubar{\Omega} \leq \Omega \leq \Bar{\Omega}\}$. The system control inputs are the rotor torques, defined by $u \vcentcolon = (\tau_1,\tau_2,\tau_3,\tau_4) \in \mathbb{R}^4$ and constrained in magnitude $\mathcal{U} = \{u \in \mathbb{R}^4 \vcentcolon \ubar{u}\leq u \leq \Bar{u}\}$. Its nonlinear dynamics are then given by the first-order ordinary differential equations:
+ \begin{equation}
+ \dot{\xi} = f(\xi,u) = 
+ \begin{pmatrix}
+ 	S^Tv_b \\
+ 	E \omega\\
+	\frac{1}{m}F_b - R G - \omega\times v_b\\
+	J^{-1}(M_b - \omega\times J\omega)\\
+	\frac{1}{J_m}(u-C_D\Omega\odot\Omega-d\Omega)
+\end{pmatrix}\label{eq:ode}%
+ \end{equation}
+ with state $\xi \vcentcolon = (p,\gamma,v_b,\omega,\Omega) \in \mathbb{R}^{16}$. The quadrotor's mass is denoted by $m$, $G =(0, 0, g) \in \mathbb{R}^3$ with $g$ being the gravitational acceleration, $d$ represents the drag coefficient of the rotor whose inertia is $J_m$. The element-wise product is denoted with $\odot$. The positive-definite matrix $J \in \mathbb{R}^{3 \times 3}$ denotes the vehicle inertia matrix. The rotation matrix from  $\{\mathcal{I}\}$ to $\{\mathcal{B}\}$ is represented by $S \in SO(3)$. Matrix $E \vcentcolon \mathbb{R}^3 \rightarrow \mathbb{R}^{3 \times 3}$ expresses the relation between the instantaneous rates of change of $\gamma$ and the instantaneous components of $\omega$. The total external forces and moments applied to the CoM of quadrotor and expressed in $\{\mathcal{B}\}$ are defined, respectively, as 
+ \begin{equation}
+ 	\begin{aligned}
+    F_b & \vcentcolon =  (0,0,F_z), \quad M_b \vcentcolon = (M_x, M_y, M_z)
+	\end{aligned}
+ \end{equation}
+ with
+ \begin{subequations}
+ \begin{align}
+ 	F_z &= C_T(\Omega_{1}^{2}+\Omega_{2}^{2}+\Omega_{3}^{2}+\Omega_{4}^{2}),\label{eq:total_thrust}\\
+ 	M_x & = C_T\cdot l(\Omega_{2}^{2}-\Omega_{4}^{2}),\\
+    M_y &= C_T\cdot l(\Omega_{3}^{2}-\Omega_{1}^{2}), \\
+    M_z & = C_D(\Omega_{1}^{2}+\Omega_{3}^{2}-\Omega_{2}^{2}-\Omega_{4}^{2}),
+ \end{align}
+ \end{subequations}
+where $C_T$ is the thrust coefficient, $C_D$ is the drag coefficient, and $l$ is the distance between the quadrotor's CoM and the rotor's center. As an example, we report  in Table \ref{tab:prm} the values of the  dynamic parameters appearing in \eqref{eq:ode} corresponding to the MikroKopter\footnote{\url{https://www.mikrokopter.de/en/home}} quadrotor platform.
+
+\begin{table}[b]
+\caption{MikroKopter physical parameters}
+\centering
+\begin{tabular}{lc}
+\toprule
+$m$ 	& $1.04$ kg \\
+$l$ 	& $0.23$ m \\
+$C_D$ 	& $10$ Nm/kHz$^2$ \\
+$C_T$ 	& $595$ N/kHz$^2$ \\
+$d$ 	& $0.5$ kN${\cdot}$m${\cdot}$s \\
+$J_m$ 	& $0.08$ $\text{g}{\cdot}\text{m}^2$ \\
+$J$ 	& $\text{diag}(0.01,0.01,0.07)$ $\text{kg}{\cdot}\text{m}^2$\\
+\bottomrule
+\end{tabular}\label{tab:prm}
+\end{table}

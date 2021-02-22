@@ -1,0 +1,54 @@
+In real-time NMPC applications, (\textbf{NLP$_1$}) and (\textbf{NLP$_2$}) need to be solved at each sampling instant under the available computation time. To that end, we use a numerical strategy based on \emph{sequential quadratic programming} (SQP) that relies on the solution of a limited number of quadratic program (QP) subproblems, the so-called real-time iteration (RTI) scheme. More precisely, in this strategy only a single linearization and QP solve are carried out per sampling instant, leading to an approximate feedback control policy. An important ingredient in the RTI scheme is to keep the initial state as a constrained decision variable, which is often referred to as \emph{initial value embedding}. This allows one to divide computations into a preparation and a feedback phase, where the former is typically more expensive. In this work, we will be using the implementation of the RTI method by means of the high-performance software package \texttt{acados}.
+
+The \emph{direct multiple shooting} approach is used in order to obtain (\textbf{NLP$_1$}) and (\textbf{NLP$_2$}). The state trajectories from stage 0 to $N$ are approximated using a numerical integration scheme, in this case an explicit Runge Kutta 4th order (ERK4), while the input trajectories are parametrized as piecewise constant. We make use of \texttt{acados} Python template-based interface to generate the libraries that implement (\textbf{NLP$_1$}) and (\textbf{NLP$_2$}), which are then wrapped by our mixed-initiative control algorithm, written in Python, which executes Algorithm 1. 
+
+\IncMargin{1em}
+\begin{algorithm}
+\SetKwInOut{Input}{Input}\SetKwInOut{Output}{Output}
+\Input{States $\Bar{\xi}_{0(k)},\Bar{\sigma}_{0(k)}$ and references $\Bar{\eta}_{(k)},\Tilde{\eta}_{(k)}$ at iteration $k$.}
+\Output{Solution $(\sigma_i,u_i)_k$ for (\textbf{NLP$_2$}$)_k$ at iteration $k$.}
+\KwData{maximum admissible error $a = (0.05,0.05,0.1)$ m, \textit{criterion}, simulation time $t_f$ = 6 s, sampling time $t_s = 0.015$ s.}
+\BlankLine
+\Begin{
+	$k \longleftarrow 0$\;
+	Calculate $\epsilon_a$ in \eqref{eq:aed}\;
+	$\check{\epsilon} \longleftarrow 0$\;
+	$\Hat{\epsilon} \longleftarrow \epsilon_a$\;
+	\For{$k \longleftarrow 0$ \KwTo $t_f/t_s$}{
+		Update $\Bar{\eta}_{(k)}$\;
+		Solve (\textbf{NLP$_1$}$)_k$ for $\Bar{\xi}_{0(k)}$\;
+		\For{$i \longleftarrow 0$ \KwTo $N$}{
+			Calculate $\epsilon^\star_{i(k)}$ in \eqref{eq:ped}\;
+		}
+		\If{criterion = $(A_1)$}{
+			\For{$i \longleftarrow N$ \KwTo $0$}{
+				\If{$\epsilon^\star_{i(k)} < \Hat{\epsilon}$}{
+      				$\Bar{N}_{i(k)} \longleftarrow \texttt{NaN}$\;
+    			}
+    			\Else{$\Bar{N}_{i(k)} \longleftarrow i$\;}{	
+    			}
+    		}
+    		$\Bar{N}_{(k)} \longleftarrow$ last non-\texttt{NaN} element of $\Bar{N}_{i(k)}$\;
+    		Evaluate zone-excursion function $\lambda_{A_1(k)}$ in \eqref{eq:lambda1}\;
+    	}
+    	\If{criterion = $(A_2)$}{
+			\For{$i \longleftarrow N$ \KwTo $0$}{
+				\If{$\epsilon^\star_{i(k)} > \Hat{\epsilon}$}{
+      				$\epsilon^\star_{i(k)} \longleftarrow \Hat{\epsilon}$\;
+    			}
+    			$\epsilon^\star_{i,max(k)} \longleftarrow \epsilon^\star_{i(k)}$\;
+    			
+			}
+			$\epsilon^\star_{max(k)} \longleftarrow \text{max}(\epsilon^\star_{i,max(k)})$\;
+			Evaluate zone-excursion function $\lambda_{A_2(k)}$ in \eqref{eq:lambda2}\;
+		}
+		Build $W(\epsilon^\star_{i(k)})$ and ${W}_N(\epsilon^\star_{i(k)})$ in \eqref{eq:weight_matrices}\;
+		Calculate $\mathcal{U}_{1(k)}$ and $\mathcal{U}_{2(k)}$ in \eqref{eq:control_law}\; 
+		Simulate human commands based on $\mathbf{R}_{d(k)}$, $\mathcal{U}_{1(k)}$ and $\mathcal{U}_{2(k)}$\;
+		Update $\Tilde{\eta}_{(k)}$\;
+		Solve (\textbf{NLP$_2$}$)_k$ for $\Bar{\sigma}_{0(k)}$\;
+		\Return $(\sigma_i, u_i)_k$
+	}
+}
+\caption{zone NMPC for mixed-initiative control}\label{algo:zonenmpc}
+\end{algorithm}\DecMargin{1em}

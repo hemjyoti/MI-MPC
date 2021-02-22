@@ -1,0 +1,40 @@
+I try to explain in simple words without formulas the main idea of the framework. the nomenclature is completely tentative.
+
+%%% ---------------------------------------------------------------
+\subsection{Problem setting}
+%%% ---------------------------------------------------------------
+
+\subsubsection{Robot} The robot is represented by a certain dynamical system and a set of `dynamical constraints' on the system variables.
+
+
+\subsubsection{Working conditions}
+Certain given conditions are given and represent the minimum requirements that the robot has to obey to operate `healthy', let us call them the `working conditions'. These can contain both safety rules (e.g., maximum kinetic energy, minimum distances from obstacles etc.) and/or task related rules (e.g., accuracy of end-effector positioning, orientation, etc.)
+
+\subsubsection{Fully autonomous controller and cost} 
+An automatic receding horizon controller is given that is able to ensure that the robot satisfies both dynamical constraints and the working conditions. We call this the `fully-autonomous controller' and the corresponding cost function is called the `fully-autonomous cost'.
+
+\subsubsection{Human inputs}
+The human is given the possibility to specify desired values for some of the system variables, either directly for some of the variable or in an implicit way (specifying the desired value of a function of the variables), these are called `human inputs'.
+
+\subsubsection{Objective} 
+Let the robot obey as much as possible to the human inputs while maintaining the working conditions and the dynamical constraints.
+
+
+%%% ---------------------------------------------------------------
+\subsection{Our proposed solution}
+%%% ---------------------------------------------------------------
+
+The objective is twofold, from one side we want the human input to be obeyed as much as possible and from the other side we want to keep valid the working conditions and dynamical constraints all the time. We know that the latter objective would be fulfilled if we  let the robot be always controlled by the fully-autonomous controller. However this alone would not ensure the first objective.
+
+
+\subsubsection{Predicted healthiness index} 
+
+At each time instant we simulate what would be the system behavior starting from the current measured state under the effect of the fully autonomous controller within the controller time horizon. From the simulated behavior we compute how far the robot is from violating the working conditions within the horizon. A certain continuous function between 0 and 1, named the `predicted healthiness index', is then computed in a way that its value is 0 if the violation is too close and 1 if it is far enough. The idea is that the closer the index to 0 the more troublesome will be to keep the system within the working condition in the next horizon, even if full control is given to the fully autonomous controller (and human inputs are completely disregarded that moment on). Viceversa, the closer the index to 1 the easier the job of the fully autonomous controller will be in case it takes full control of the system.
+
+\subsubsection{Actual robot controller} 
+
+We let the robot be controlled by a receding horizon controller which is a copy of the full autonomous controller a part from a major difference, its cost function, named the `actual robot cost', is a convex combination between the fully autonomous cost and the `human input cost'. The latter is a cost term which penalizes the divergence from the human inputs. The convex combination is driven by the  Predicted healthiness index, when the index tends to 0 the actual robot cost tends to the fully-autonomous cost, when the index tends to 1 the actual robot cost tends to the human input cost.
+
+
+
+

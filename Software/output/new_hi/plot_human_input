@@ -1,0 +1,111 @@
+clear all;
+clc;
+filename = 'saved_data_saturating_reverse_100Hz.txt';
+delimiterIn = ' ';
+headerlinesIn = 1;
+A = importdata(filename,delimiterIn,headerlinesIn);
+% for k = [3, 5]
+%    disp(A.colheaders{1, k})
+%    disp(A.data(:, k))
+%    disp(' ')
+% end
+[A,delimiterOut]=importdata(filename);
+figure(1115);
+t=linspace(0,80,length(A(:,1)));
+% subplot(4,1,1)
+plot(A(:,8)/1000000,-A(:,1)/60, 'LineWidth',4);
+hold on;
+plot(A(:,8)/1000000,-A(:,2)/60, 'LineWidth',4);
+hold on;
+plot(A(:,8)/1000000,9710/120*ones(1,length(A(:,1))), 'LineWidth',4);
+hold off;
+xlabel('Time (sec)');
+ylabel('speed [Hz]') ;
+legend('\Omega [Hz]','\Omega_d [Hz]')
+propertyeditor('on');
+grid on;
+set(gca,'Fontsize',20);
+
+
+figure(1120);
+% t=linspace(0,80,length(A(:,1)));
+% subplot(4,1,1);
+plot(A(:,8)/1000000,-A(:,1)/60+A(:,2)/60, 'LineWidth',4);
+xlabel('Time (sec)');
+ylabel('error in speed tracking[Hz]') ;
+% legend('\Omega [Hz]','\Omega_d [Hz]')
+propertyeditor('on');
+grid on;
+set(gca,'Fontsize',20);
+
+% figure(12);
+% subplot(2,1,1);
+% plot(t,A(:,3), 'LineWidth',4);
+% temp=A(:,3);
+% corr_temp(1)=temp(1);
+% for i=2:length(temp)
+%     if abs(temp(i)-temp(i-1))>10
+%         corr_temp(i)=temp(i-1);
+%     end
+% end
+% B=rmoutliers(temp,'percentiles',[85,100]);
+% subplot(2,1,2);
+% plot(corr_temp)
+% title('degrees');
+figure(13);
+subplot(2,1,1);
+plot(A(:,8)/1000000,A(:,5)/1000, 'LineWidth',4);
+set(gca,'Fontsize',20);
+grid on;
+% title('Current');
+xlabel('Time (s)');
+ylabel('Current(Amps)');
+% plot(A(:,8)/1000000,-A(:,1)/60, 'LineWidth',4);
+% xlabel('Time (sec)');
+% ylabel('speed [Hz]') ;
+% legend('\Omega [Hz]','\Omega_d [Hz]')
+propertyeditor('on');
+grid on;
+set(gca,'Fontsize',20);
+
+% figure(14);
+subplot(2,1,2);
+plot(A(:,8)/1000000,A(:,6)/1000, 'LineWidth',4);
+hold on;
+% windowSize = 20; 
+% b = (1/windowSize)*ones(1,windowSize);
+% a = 1;
+volt=A(:,6)/1000;
+volt_sum=0;
+for i=1:length(volt)
+    if (i<=500 || i >=length(volt)-500)
+        volt_avg(i)=volt(i);
+    else
+        for j=1:500
+        volt_sum=volt_sum+volt(i-j);
+        end
+        volt_avg(i)=volt_sum/500;
+        volt_sum=0;
+    end
+end
+% volt_avg=filter(a,b,volt);
+ plot(A(:,8)/1000000,volt_avg, 'LineWidth',4);   
+grid on;
+hold off;
+% title('Voltage');
+xlabel('Time (s)');
+ylabel('Voltage(volts)');
+legend('Unfiltered','Filtered')
+set(gca,'Fontsize',20);
+
+% figure(15);
+% subplot(4,1,4);set(gca,'Fontsize',20);
+figure(15);
+plot(A(:,8)/1000000,A(:,7), 'LineWidth',4);
+set(gca,'Fontsize',20);
+% title('PID control Command');
+xlabel('Time (sec)');
+ylabel('Control command');
+grid on;
+% 
+% 

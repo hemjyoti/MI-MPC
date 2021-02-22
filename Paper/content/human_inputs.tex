@@ -1,0 +1,28 @@
+Usually, pilots provide the quadrotor with the desired roll, pitch, $z$ angular rate, and total thrust, i.e., $g = (\phi_h,\theta_h,\omega_z, F_{z,h}) \in \mathbb{R}^4$. For simplicity, we assume that the desired $z$ angular rate is zero throughout the task, and the total thrust is mapped into the speed of the propellers, i.e., $\nu^r \vcentcolon g \mapsto \mathbb{R}^6$. To simulate the pilot inputs, we use a second NMPC controller that reads as follows:
+\begin{equation}\label{eq:nlp}
+{\!\!\!\!\!}{\!\!}\begin{aligned}
+&\underset{\begin{subarray}{c}
+\xi_0, \dots, \xi_N, \\
+u_0, \dots, u_{N-1}
+\end{subarray}}{\min} \frac{1}{2}\sum_{i=0}^{N-1} \Delta\eta_i^TQ_1\Delta\eta_i + \gamma_i^TQ_2\gamma_i + v_{b,i}^TQ_3v_{b,i} \\
+&\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\, + \omega_i^TQ_4\omega_i + \Delta\Omega_i^TQ_5\Delta\Omega_i+u_i^TR_1u_i\\ 
+& \,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\, + \frac{1}{2}(\Delta\eta_N^TQ_{1N}\Delta\eta_N + \gamma_N^TQ_{2N}\gamma_N + v_{b,N}^TQ_{3N}v_{b,N} \\
+&\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\, + \omega_N^TQ_{4N}\omega_N + \Delta\Omega_N^TQ_{5N}\Delta\Omega_N)\\
+&\,\,\,\quad \text{s.t.} \,\,\,\,\,\,\,\,\, \eqref{eq:a}-\eqref{eq:d}.
+\end{aligned}{\!\!\!}
+\end{equation}
+Here, $\Delta\Omega_i = (\Omega_i-\Omega_{\text{hovering}})$ for $i=0,\dots, N$ represents the propeller speed errors, where  $\Omega_{\text{hovering}} = \sqrt{(mg/4C_T)}$. The positive-definite weighting matrices are denoted by $Q_i, \,Q_{iN}$ for $i=1,\dots,5$ and $R_1$. In particular, constraint \eqref{eq:c} represents the control interface's real limitation. 
+
+Once the solution of \eqref{eq:nlp} is computed, we can use the predicted state at stage $i=1$ as pilot inputs, namely
+\begin{equation}
+	\phi_h = \phi^\star, \quad \theta_h = \theta^\star, \quad \Omega_h = \Omega^\star,
+\end{equation}
+where the superscript $\star$ indicates the optimal solution.
+\begin{remark} In practice, the total thrust coming from the joystick can be easily mapped into the propellers' desired speed and passed to the MI controller if one uses Eq. \eqref{eq:total_thrust} assuming hovering condition, i.e., $\Omega_{1} = \Omega_{2} = \Omega_{3} = \Omega_{4} = \Omega_{ss}$, which yields
+\begin{equation*}
+	\Omega_{ss} = \sqrt{\frac{F_{z,h}}{4C_T}}, \quad \Omega_h = \Omega_{ss}{\cdot}\mathbf{1_4}.
+\end{equation*} 
+\end{remark}
+The distinction between pilots with a different skill level is made through the weighting matrices of the controller. Flying a quadrotor is less automated for novice pilots and for this reason requires more of their attention span than experienced ones. Due to their limited self-regulatory ability, their inputs tend to be oscillatory (lower values in the weighting matrices). In contrast, the inputs of experienced pilots tend to be more precise (higher values in the weighting matrices), presumably reflecting their ability to use perceptual cues to support their actions.
+
+Moreover, as we need to predict human inputs to solve Problem \ref{problem:mi}, we adopt a zero-order hold (ZOH) method. This prediction method assumes that the future human inputs will all be the same as the current ones, an assumption that proved to be surprisingly effective in experimentation (see \cite{chipalkatty2013}).  

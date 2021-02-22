@@ -1,0 +1,11 @@
+While the particular requirements that a robot has to obey may differ from one system to another, a generic approach is to express these requirements through suitable working conditions. In this paper, we are inspired by drone racing, where the conditions must be designed to help pilots safely fly a quadrotor along a trajectory in an arena with obstacles. To this end, we impose a maximum deviation $\alpha \in \mathbb{R}^{n_\eta}_{>0}$ from the reference trajectory to enforce safety. In terms of Euclidean norm, this condition reads as follows:
+\begin{equation}
+	d(\eta) = \|\eta-\eta^r\| \leq \|\alpha\|. \label{eq:distance_function}
+\end{equation}
+Any point $\eta$ satisfying \eqref{eq:distance_function} describes a convex free region $\mathcal{B}$, which we defined as
+\begin{equation}
+	\mathcal{B} = \{\eta \in \mathbb{R}^{n_\eta} \vcentcolon \|\eta-\eta^r\| \leq \|\alpha\| \}.
+\end{equation}
+We observe that $\mathcal{B}$ is a norm ball fully described by its center point $\eta^r$. This observation implies that the robot is softly constrained to move inside of a ball, where its actual trajectory is just one of the possible trajectories that avoid collisions, and at best, it is the reference trajectory itself. 
+
+Unlike the set of constraints intrinsic to the mixed-initiative NMPC, the working conditions are extrinsic constraints that facilitate the decoupled design of the safety- and/or task-related rules through the task variables. Ideally, the controller steers these variables to a steady value contained into the convex free region $\mathcal{B}$, while satisfying the constraints of Problem \ref{problem:mi} throughout its evolution \cite{camacho2010}. 

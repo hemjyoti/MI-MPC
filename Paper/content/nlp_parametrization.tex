@@ -1,0 +1,7 @@
+Among several approaches available to discretize continuous-time OCPs, direct multiple shooting \cite{bock1984} will be used in this work due to its convergence and initialization properties. Additionally, we approximate the Hessian of the Lagrangian using the Generalized Gauss-Newton method so that structure-exploiting convex solvers can profit from the particular block-structure of the resulting quadratic program (QP).  
+
+This endeavor's time horizon is $T$, which we divide into $N$ intervals so that we have the discrete-time step $\Delta t = T/N$. Assuming an equidistant grid and piecewise constant control parameterization, the following initial value problem defines the state trajectory $\xi(\pi)$ at each shooting interval:
+\begin{equation}
+	\dot{\xi}(\pi) = f(\pi,\xi(\pi),u_i), \quad \xi(t_i) = \xi_i, \quad \forall \pi \in [t_i, t_{i+1}].\label{eq:discrete_dyn}
+\end{equation}
+Function \eqref{eq:discrete_dyn} is evaluated numerically, $\xi(t_{i+1}) \approx F(\xi_i,u_i)$, using one step of explicit Runge Kutta 4th order per $\Delta t$.

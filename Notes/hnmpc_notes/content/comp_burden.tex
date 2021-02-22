@@ -1,0 +1,39 @@
+Computation times reported are from an Intel Core i5 $@2.6$ GHz running macOS Catalina. Whether the sparse, condensed or partially condensed formulation is more appropriate for a certain problem depends mainly on the horizon length and the ratio between number of states and controls. In this particular problem, we note that the partially condensed QP is more beneficial from a computational point of view. \texttt{HPIPM} is significantly faster in solving the partially condensed QP arising in each NMPC formulation compared to the corresponding dense QP (see Table \ref{tab:cputime_pc} and \ref{tab:cputime_c}). The dense solver \texttt{qpOASES} was also tested, but did not return a solution for any of the attempts.
+
+In the condensed formulation, all state deviations are eliminated via the continuity constraints of (\textbf{NLP$_1$}) and (\textbf{NLP$_2$}) leading to a smaller but dense QP. Conversely, partial condensing is a condensing strategy that is in-between the sparse and the fully condensed formulations. In this strategy, a state component is retained as an optimization variable at each stage of the partially condensed QP. Given the dimensions of the optimal control problems (OCP) involved in our mixed-initiative control algorithm, partial condensing allows to better exploit hardware throughput.
+
+\begin{table}[h]
+\caption{Average computation times in [ms] for partial condensing.}
+\begin{tabular}{lccccccc}
+\toprule
+\multirow{2}[3]{*}{} & & \multicolumn{2}{c}{} & \multicolumn{2}{c}{\texttt{HPIPM}}\\
+\cmidrule(lr){3-8}
+ & \multirow{2}[3]{*}{Condensing approach} & \multicolumn{2}{c}{\textbf{L0}} & \multicolumn{2}{c}{\textbf{L1}} & \multicolumn{2}{c}{\textbf{L2}}\\
+\cmidrule(lr){3-4} \cmidrule(lr){5-6} \cmidrule(lr){7-8}
+ & & $(A_1)$ & $(A_2)$ & $(A_1)$ & $(A_2)$ & $(A_1)$ & $(A_2)$\\
+\midrule
+LL NMPC\footnotemark & \textit{partial condensing} & 4.92 & 4.51 & 4.53 & 4.04 & 4.05 & 3.88 \\
+\midrule
+zone NMPC & \textit{partial condensing} & 10.09 & 9.74 & 7.58 & 7.62 & 6.83 & 7.51 \\
+\bottomrule
+\end{tabular}\label{tab:cputime_pc}
+\end{table}
+
+\begin{table}[h]
+\caption{Average computation times in [ms] for condensing.}
+\begin{tabular}{lccccccc}
+\toprule
+\multirow{2}[3]{*}{} & & \multicolumn{2}{c}{} & \multicolumn{2}{c}{\texttt{HPIPM}}\\
+\cmidrule(lr){3-8}
+ & \multirow{2}[3]{*}{Condensing approach} & \multicolumn{2}{c}{\textbf{L0}} & \multicolumn{2}{c}{\textbf{L1}} & \multicolumn{2}{c}{\textbf{L2}}\\
+\cmidrule(lr){3-4} \cmidrule(lr){5-6} \cmidrule(lr){7-8}
+ & & $(A_1)$ & $(A_2)$ & $(A_1)$ & $(A_2)$ & $(A_1)$ & $(A_2)$\\
+\midrule
+LL NMPC & \textit{condensing} & 9.67 & 8.43 & 8.53 & 7.30 & 7.78 & 7.15 \\
+\midrule
+zone NMPC & \textit{condensing} & 14.07 & 13.60 & 10.47 & 10.74 & 9.43 & 10.08 \\
+\bottomrule
+\end{tabular}\label{tab:cputime_c}
+\end{table}
+
+\footnotetext{shorthand for low-level NMPC.}

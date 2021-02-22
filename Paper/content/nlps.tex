@@ -1,0 +1,27 @@
+When using NMPC to control a system, at each sampling instant, a nonlinear nonconvex program is solved using the current state as the initial value. However, as the programs' solution times can be rather long, the employment of NMPC has only recently been extended to applications where shorter sampling times are required \cite{barros2020b}. Typically, a continuous-time, infinite-dimensional optimal control problem (OCP) is tailored according to the problem at hand, discretized using some numerical strategy, and then solved. In doing so, the tailored OCP is transformed into a discrete-time, finite-dimensional nonlinear program (NLP) for which the optimally conditions are set up and solved at each sampling instant. In our approach, we cast the mixed-initiative (MI) controller as a constrained NLP formulated as follows:
+
+\begin{problem}[Mixed-Initiative Controller]
+\begin{subequations}
+{\!\!\!\!\!}{\!\!}\begin{align}
+&\underset{\begin{subarray}{c}
+\xi_0, \dots, \xi_N, \\
+u_0, \dots, u_{N-1}
+\end{subarray}}{\min}	    &&\sum_{i=0}^{N-1} L(\eta_i, \nu_i, \xi_i, u_i) + M(\eta_N, \nu_N,\xi_N)\\
+&\,\,\,\quad \textnormal{s.t.}    &&\xi_0 - \Bar{\xi}_0 = 0, \label{eq:a}\\
+& 						    &&\xi_{i+1} - F(\xi_i,u_i) = 0, \,\,\,\, i = 0,\dots, N-1,\\
+& 						    &&\xi_i\in \mathcal{X}, \,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\, i = 0,\dots, N-1,\label{eq:c}\\
+& 						    &&u_i\in \mathcal{U},\label{eq:d} \,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\, i = 0,\dots, N-1,
+\end{align}{\!\!\!}
+\end{subequations} where
+\begin{equation*}
+\begin{aligned}
+		L(\eta_i, \nu_i, \xi_i, u_i) &\vcentcolon = \frac{1}{2}(\Delta\eta_i^T(1-\lambda)Q_{\eta}\Delta\eta_i + \Delta\nu_i^T\lambda Q_\nu\Delta\nu_i + \\
+		& \,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\Delta e_i^T(1-\lambda)Q_e\Delta e_i + u_i^T(1-\lambda)Ru_i)\\
+		M(\eta_N, \nu_N,\xi_N) &\vcentcolon = \frac{1}{2}(\Delta\eta_N^T(1-\lambda)Q_{\eta_N}\Delta\eta_N + \\
+		& \,\,\,\,\,\,\Delta\nu_N^T\lambda Q_{\nu_N}\Delta\nu_N + \Delta e_N^T(1-\lambda)Q_{e_N}\Delta e_N).
+\end{aligned}
+\end{equation*}\label{problem:mi}%
+\end{problem}
+Therein, stage and terminal cost terms are represented by $L$ and $M$, respectively. We denote the task variables tracking error as $\Delta\eta_i = \eta_i - \eta_i^r$, $\Delta\eta_N = \eta_N - \eta_N^r$, and the human inputs tracking error as $\Delta\nu_i = \nu_i - \nu_i^r$, $\Delta\nu_N = \nu_N - \nu_N^r$. The cost function also includes other penalty terms that might by relevant to the specific application. Their tracking errors are denoted as $\Delta e_i = h(\xi_i)-e_i^r$, and $\Delta e_N = h(\xi_N)-e_N^r$, where the output functions $h(\xi),\, h(\xi_N) \in \mathbb{R}^{n_h}$ and their respective references $e_i^r, e_N^r \in \mathbb{R}^{n_h}$ are defined by the relative complement $\mathbb{R}^{n_\xi} \setminus (\mathbb{R}^{n_\eta} \cup \mathbb{R}^{n_\nu})$. Note that $\xi \vcentcolon = (\xi_0, \dots, \xi_N)$ and $u \vcentcolon = (u_0,\dots,u_{N-1})$ represent the state and input trajectories of the discrete-time system whose dynamics are described by $F \vcentcolon \mathbb{R}^{n_{\xi}} \times \mathbb{R}^{n_u} \rightarrow \mathbb{R}^{n_{\xi}}$. 
+
+Moreover, $\mathcal{X}$ and $\mathcal{U}$ implement the state and input constraints associated with the physical limitations of the robot. Denoted by $N$ is the horizon length and by $\bar{\xi}_0$ the current state estimate. The stage and terminal cost terms are weighted by the positive-definite weighting matrices $Q_{\eta}, Q_{\eta_N} \in \mathbb{R}^{n_\eta \times n_\eta}$, $Q_{\nu}, Q_{\nu_N} \in \mathbb{R}^{n_\nu \times n_\nu}$, $Q_{e}, Q_{e_N} \in \mathbb{R}^{n_h\times n_h}$, and $R \in \mathbb{R}^{n_u \times n_u}$. The scaling factor $\lambda \in (0,1)$ is the output of the blending mechanism and is used to determine how control authority should be mixed. Looking at the cost function, one can observe that increasing the value of $\lambda$ will give more weighting to keeping the human inputs closer than the motion generator commands. Note that we consider an open interval because we are interested in convex problems. Finally, once the solution is computed, the first element of the input trajectory $u_0$ is applied to the system before shifting the horizon forward in time (see Fig.~\ref{fig:block_diagram} for an illustration with the notations). 

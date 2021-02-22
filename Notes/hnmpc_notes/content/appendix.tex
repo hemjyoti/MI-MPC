@@ -1,0 +1,43 @@
+\section{Generation of Human Commands}\label{ap:human_commands}
+Given the reference attitude $\mathbf{R}_d$ and the nominal input $(\mathcal{U}_1,\mathcal{U}_2)$, it is possible to determine the desired attitude ($\phi^d_h,\theta^d_h, \psi^d_h$) and speed of the propellers ($\Omega^d_{h,[1,4]}$) that correspond to the human inputs. We will define the following parametrization of the rotation matrix:
+\begin{equation*}
+	\mathbf{R}_d = \begin{pmatrix} cos\theta cos\psi & -cos\phi sin\psi + sin\phi sin\theta cos\psi & sin\phi sin\psi + cos\phi cos\theta cos\psi \\
+	cos\theta sin\psi & cos\phi sin\psi + sin\phi sin\theta sin\psi & -sin\theta cos\psi + cos\phi sin\theta sin\psi \\
+	-sin\theta & sin\phi cos\theta & cos\phi cos\theta	
+	\end{pmatrix}.
+\end{equation*}
+
+Based on that, one can compute the desired attitude by doing:
+\begin{equation*}
+\begin{aligned}
+	\phi^d_h = \text{atan2}\left( \frac{\mathbf{R}_{d,32}}{\mathbf{R}_{d,33}} \right), \quad \theta^d_h = -\text{asin}\left ( \mathbf{R}_{d,31} \right ), \quad \psi^d_h = \text{atan2}\left( \frac{\mathbf{R}_{d,21}}{\mathbf{R}_{d,11}} \right).
+\end{aligned}
+\end{equation*}
+
+Moreover, to compute the desired speed of the propellers we assume control decoupling. First, we linearize the forces and moments in \eqref{eq:force_moments} and rewrite them in the following matrix format:
+\begin{equation}
+	\begin{pmatrix}F_z \\M_x \\M_y \\M_z \end{pmatrix} = 2\Omega_e\underbrace{\begin{pmatrix} C_T & C_T & C_T & C_T \\
+	-C_Tl & -C_Tl & C_Tl & C_Tl \\
+	-C_Tl & C_Tl & C_Tl & -C_Tl \\
+	-C_D & C_D & -C_D & C_D
+	\end{pmatrix}}_{\mathbf{\Gamma}}
+	\begin{pmatrix}\Delta \Omega_1\\ \Delta \Omega_2\\ \Delta \Omega_3\\ \Delta \Omega_4\end{pmatrix},\label{eq:gamma}%
+\end{equation}
+where $\Omega_e$ is the required speed of each rotor in order to maintain the hover position, and the prefix $\Delta$ indicates the result of a linearization process.
+
+Second, if matrix $\mathbf{\Gamma}$ is invertible, then the lines are linearly independent, meaning that the forces and moments acting on the CoM of the quadrotor are independently from each other. The inverse relation  of \eqref{eq:gamma} is given by
+\begin{equation}
+\begin{pmatrix}\Delta \Omega_1\\ \Delta \Omega_2\\ \Delta \Omega_3\\ \Delta \Omega_4\end{pmatrix} = \frac{1}{2\Omega_e}\underbrace{\begin{pmatrix}
+1/(4C_T) & -1/(4C_Tl) & -1/(4C_Tl) & -1/(4C_D)\\
+1/(4C_T) & -1/(4C_Tl) & 1/(4C_Tl) & 1/(4C_D)\\
+1/(4C_T) & 1/(4C_Tl) & 1/(4C_Tl) & -1/(4C_D)\\
+1/(4C_T) & 1/(4C_Tl) & -1/(4C_Tl) & 1/(4C_D)
+\end{pmatrix}}_{\mathbf{\Gamma}^{-1}}
+\begin{pmatrix}F_z \\M_x \\M_y \\M_z \end{pmatrix}.\label{eq:gamma_inv}%
+\end{equation}
+
+The inverse mapping \eqref{eq:gamma_inv} dictates how each of the forces acting on the CoM of the quadrotor contributes to the rotation speed of each propeller. We can use this fact to establish the relation between the nominal input of the reactive controller and the desired speed of the propellers, which are further passed on to (\textbf{NLP}$_2$). Consequently, we have that
+\begin{equation*}
+\begin{pmatrix}\Omega^d_{h,1}\\ \Omega^d_{h,2}\\ \Omega^d_{h,3}\\ \Omega^d_{h,4}\end{pmatrix} = \frac{1}{2\Omega_e}\mathbf{\Gamma}^{-1}\begin{pmatrix}\mathcal{U}_{1,z}\\ \mathcal{U}_2\end{pmatrix},
+\end{equation*}
+where $\mathcal{U}_{1,z}$ is the $z$ component of vector $\mathcal{U}_1$.

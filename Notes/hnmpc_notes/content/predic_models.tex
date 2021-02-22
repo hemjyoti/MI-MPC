@@ -1,0 +1,58 @@
+Let $\{\mathcal{B}\}$ be the body-fixed frame, located at the center of mass (CoM) of a quadrotor, aligned with the North-West-Up (NWU) inertial frame $\{\mathcal{I}\}$. In order to implement the low-level NMPC, we consider a nonlinear dynamic model of the form
+\begin{equation*}
+	\dot{\xi} = f_1(\xi,u).
+\end{equation*}
+We then define the state vector, considering only the dynamics of the robot:
+\begin{equation*}
+	\xi := (p,\gamma,v_b,\omega,\Omega)^T \in \mathbb{R}^{16},
+\end{equation*}
+where $ p := (x, y, z)$  is the position vector in $\{\mathcal{I}\}$, $ \gamma := (\phi,\theta,\psi)$ are the Euler angles for orientation, $v_b := (v_x, v_y, v_z)$ is the linear velocities vector in $\{\mathcal{B}\}$, $\omega := (\omega_x, \omega_y, \omega_z)$ is the vector of angular rates, and finally $\Omega := (\Omega_1,\Omega_2,\Omega_3,\Omega_4)$ is the vector containing the rotation speed of the propellers. Hence, we regard the following quadrotor model:
+ \begin{equation*}
+ 	\begin{aligned}
+ 	\dot{p} &= Rv_b \\
+ 	\dot{\gamma} &= T \omega\\
+	\dot{v}_b &= \frac{1}{m}F - R^{T}G - \omega\times v_b\\
+	\dot{\omega} &= J^{-1}(M - \omega\times J\omega)\\
+	\dot{\Omega} &= \frac{\tau}{J_m},
+ 	\end{aligned}%
+ \end{equation*}
+ \textcolor{red}{AF: what about drag of the rotor in the motor equation?}
+where the mass of the quadrotor is $m \in \mathbb{R}^+$, and $G \vcentcolon =(0, 0, mg)^T$ with $g$ being the gravitational acceleration. The robot inertia matrix with respect to its CoM and expressed in $\{\mathcal{B}\}$ is given by $J \vcentcolon = \text{diag}(J_{xx}, J_{yy}, J_{zz}) \in \mathbb{R}^{3 \times 3}$. The rotation matrix from  $\{\mathcal{B}\}$ to $\{\mathcal{I}\}$ is expressed as $R \in SO(3)$. The matrix $T \vcentcolon \mathbb{R}^3 \rightarrow \mathbb{R}^{3 \times 3}$ represents the relation between the instantaneous rates of change of the Euler angles and the instantaneous components of $\omega$. \textcolor{red}{AF: define ALL the symbols introduced, here and after} The total external forces and moments applied to the CoM of quadrotor in $\{\mathcal{B}\}$ are defined as 
+ \begin{equation}
+ 	\begin{aligned}
+    F & \vcentcolon =  \sum_{i=1}^4 C_T\Omega_{i}^2\mathbf{1}_z, \quad M \vcentcolon = (M_x, M_y, M_z)^T
+	\end{aligned}
+ \end{equation}\label{eq:force_moments}
+ with
+ \begin{equation*}
+ 	\begin{aligned}
+    M_x &= C_T\cdot l(-\Omega_{1}^{2}-\Omega_{2}^{2}+\Omega_{3}^{2}+\Omega_{4}^{2}),\\
+    M_y &= C_T\cdot l(-\Omega_{1}^{2}+\Omega_{2}^{2}+\Omega_{3}^{2}-\Omega_{4}^{2}),\\
+    M_z &= C_D(-\Omega_{1}^{2}+\Omega_{2}^{2}-\Omega_{3}^{2}+\Omega_{4}^{2}),
+ 	\end{aligned}
+ \end{equation*}
+where $C_T$ is the thrust coefficient, $C_D$ is the drag coefficient, and $l$ is half of the distance between motors. When considering a medium-size quadrotor, the rotor inertia $J_m$ is not negligible as the radius of the rotor's axle is not small. Therefore, we consider the rotor torques as the control inputs of this system
+\begin{equation}
+	u := (\tau_1,\tau_2,\tau_3,\tau_4)^T \in \mathbb{R}^4.\label{eq:control_inputs}
+\end{equation}
+
+
+
+Moreover, for the zone NMPC let us consider the following nonlinear dynamic model:
+\begin{equation*}
+	\dot{\sigma} = f_2(\sigma,u).
+\end{equation*}
+This model is composed of the robot dynamics plus part of the robot dynamics that the human is able to control. For a quadrotor, the latter is essentially composed of the rotational dynamics and the translational dynamics in $z$ (which is directly linked to the collective speed of the propellers). Thus, we can formally define the part of the dynamics controlled by the human as:
+\begin{equation*}
+	\nu \vcentcolon = (\gamma, \omega, \Omega)^T \in \mathbb{R}^{10}.
+\end{equation*}
+Then, the state vector of the zone NMPC can be characterized as follows:
+\begin{equation*}
+	\sigma \vcentcolon = (p,\gamma,v_b,\omega,\Omega,\nu)^T \in \mathbb{R}^{26},
+\end{equation*}
+while the control inputs are the rotor torques, likewise regarded in \eqref{eq:control_inputs}.
+
+
+
+\textcolor{red}{AF: this is confusing. Some of the states seem to appear twice. I would rather say that in this controller there are some additional exogenous inputs provided by the human which are the desired orientation and desired total thrust and give to these quantities a different name. In any case these quantities should not appear in the state of the robot, in the sense that they do not affect the robot dynamics directly, but rather in the objective function, i.e., in the controlled (closed loop) dynamics, in the same way the desired trajectory appear.}
+

@@ -1,0 +1,8 @@
+The scenario under consideration is inspired by a persistent navigation task in which a person modifies the reference that is autonomously tracked by a robot, rather than piloting the robot itself. The human is assisted by our mixed-initiative control algorithm which allows deformation in the trajectory followed by the robot.
+
+In practice, we would like to use the path calculated by a path planner as reference to $(\mathbf{NLP}_1)$ and the part corresponding to the automatic controller in $(\mathbf{NLP}_2)$. A path is only a sequence of points on the map, typically without heading (orientation of the robot), velocity information, and time indexing. These need to be added before we can use the provided path as reference trajectory in the aforementioned NLPs, which can still be kinodynamically infeasible. When a high-quality reference trajectory (e.g. dynamically feasible, close to a global optimal, etc.) is readily available, it should be used. This can be employed to initialize and thereby drastically speed-up subsequent optimization solutions, and improve the convergence behavior of the algorithm. Nevertheless, a path planner (even a coarse one) is often not available and may be expensive to design or time-consuming to run. Thus, our approach includes a very simple initialization scheme.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\paragraph{Global Reference:} \input{content/global_ref}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\paragraph{Human Guidance:} \input{content/human_guidance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

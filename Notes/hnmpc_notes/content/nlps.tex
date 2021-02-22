@@ -1,0 +1,37 @@
+We regard the nonlinear program (\textbf{NLP$_1$}) corresponding to the constrained optimization problem of the low-level NMPC as follows:
+\begin{equation*}\label{eq:nlp1}
+{\!\!\!\!\!}{\!\!}\begin{aligned}
+&\underset{\begin{subarray}{c}
+\xi_0, \dots, \xi_N, \\
+u_0, \dots, u_{N-1}
+\end{subarray}}{\min}	    &&\frac{1}{2}\sum_{i=0}^{N-1} \|\eta(\xi_i, u_i)-\Bar{\eta}\|^2_{W} + \frac{1}{2}\|\eta_N(\xi_N)- \Bar{\eta}_N\|^2_{W_N}\\ 
+&\,\,\,\quad \text{s.t.}    &&\xi_0 = \Bar{\xi}_0, \\
+& 						    &&\xi_{i+1} - F_1(\xi_i,u_i) = 0, \,\,\,\,\,\, i = 0,\dots, N-1,\\
+& 						    &&\Omega_i\in \mathbb{E}, \,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\, i = 0,\dots, N-1,\\
+& 						    &&u_i\in \mathbb{U}, \,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\, i = 0,\dots, N-1,
+\end{aligned}{\!\!\!}
+\end{equation*}
+\textcolor{red}{AF: shouldn't the desired state $\Bar{\eta}$ depend on $i$ since it is time varying? Also please make it clear from the beginning, in the problem setting, that this is a trajectory that is passed to the system by an external planner in order to execute the task.}
+where $\xi \in \mathbb{R}^{n_{\xi}}$ and $u \in \mathbb{R}^{n_u}$ denote the state and input trajectories of the discrete-time robot system whose dynamics are described by $F_1 \vcentcolon \mathbb{R}^{n_{\xi}} \times \mathbb{R}^{n_u} \rightarrow \mathbb{R}^{n_{\xi}}$. The residuals in the stage and terminal least-squares terms are denoted by $\eta \vcentcolon \mathbb{R}^{n_{\xi}} \times \mathbb{R}^{n_u} \rightarrow \mathbb{R}$ and $\eta_N \vcentcolon \mathbb{R}^{n_{\xi}} \rightarrow \mathbb{R}$, and will be penalized by the symmetric positive-definite matrices $W$ and $W_N$, respectively. The output variables $\Bar{\eta} \vcentcolon \mathbb{R}^{n_{\xi}} \times \mathbb{R}^{n_u} \rightarrow \mathbb{R}$ and $\Bar{\eta}_N \vcentcolon \mathbb{R}^{n_{\xi}} \rightarrow \mathbb{R}$ represent the time-varying references passed to the automatic controller. We denote the admissible sets of $u$ and $\Omega$ as $\mathbb{U} \vcentcolon = [\ubar{u}, \Bar{u}]$ and $\mathbb{E} \vcentcolon = [\ubar{\Omega}, \Bar{\Omega}]$, where the bounds $\ubar{u}$, $\Bar{u}$, $\ubar{\Omega}$, and $\Bar{\Omega}$ are given. Finally, $N$ and $\Bar{\xi}_0$ denote the horizon length and the current state of the system, respectively. 
+
+\textcolor{red}{AF: Another general comment I have is that I am not sure that making the difference between Euler angles is mathematically correct, anyway let's go back to this later.}
+
+Similarly, the nonlinear program (\textbf{NLP$_2$}) that corresponds to the constrained optimization problem of the zone NMPC is:
+\begin{equation*}\label{eq:nlp2}
+{\!\!\!\!\!}{\!\!}\begin{aligned}
+&\underset{\begin{subarray}{c}
+\sigma_0, \dots, \sigma_N, \\
+u_0, \dots, u_{N-1}
+\end{subarray}}{\min}	    &&\frac{1}{2}\sum_{i=0}^{N-1} \|\eta(\sigma_i,u_i)-\Tilde{\eta}\|^2_{W(\epsilon_i^ \star)} + \frac{1}{2}\|\eta_N(\sigma_N)-\Tilde{\eta}_N\|^2_{W_N(\epsilon_i^\star)}\\ 
+&\,\,\,\quad \text{s.t.}    &&\sigma_0 = \Bar{\sigma}_0, \\
+& 						    &&\sigma_{i+1} - F_2(\sigma_i,u_i) = 0, \,\,\,\,\,\, i = 0,\dots, N-1,\\
+& 						    &&\Omega_i\in \mathbb{E}, \,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\, i = 0,\dots, N-1,\\
+& 						    &&u_i\in \mathbb{U}, \,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\, i = 0,\dots, N-1,
+\end{aligned}{\!\!\!}
+\end{equation*}
+
+\textcolor{red}{AF: OK, now I think understand better why you are elongating the state vector $\xi$ in $\eta$ repeating some its entries again, I guess this is in order to make the difference in the cost function and then the weighting matrix will take care of the mixing, giving more importance to $\xi$ part of $\eta$ or to the repeated entries. I think this should be better explained. I think that it is probably better to separate the two parts of the norms, the trajectory following and the human-following one, otherwise it remains hidden in the formulation for the reader and it could be misunderstood. I think it is better to not introduce $\eta$ as an extended/repeated $\xi$ but to actually reuse $\xi$ in this second optimization problem together with a portion of $\xi$ which you can call $\xi_h$ and is  the human 'output' to be regulated in order to match the human 'commands' and to show them separately in this optimization. In this way everything becomes more clear in my view. Another way to do so is to immediately define block-diag  structure of the weighting matrix and to define the vector $\eta$ as the stack of $\xi$ and $\xi_h$ so that is more clear.}
+
+\textcolor{red}{AF: another thing that is confusing at this point is how come the human can give desired propeller rates for each propeller at the same time, together with the desired attitude? This is too  complex for a human. What the human specifies is actually the total thrust, which is a function of the propeller rates but it does not specify them completely, there are several DoF left. We have to immediately say how we go from the desired thrust to all the propeller rates. I guess this partially explained in the appendix, but on the one side the explanation given in appendix is not completely clear to me and on the other side I think it should be immediately explained, not delayed to the appendix. }
+
+where $\sigma \in \mathbb{R}^{n_{\sigma}}$ and $u \in \mathbb{R}^{n_u}$ denote the state and input trajectories of the discrete-time robot-human system whose dynamics are described by $F_2 \vcentcolon \mathbb{R}^{n_{\sigma}} \times \mathbb{R}^{n_u} \rightarrow \mathbb{R}^{n_{\sigma}}$. The residuals in the stage and terminal least-squares terms are denoted by $\eta \vcentcolon \mathbb{R}^{n_{\sigma}} \times \mathbb{R}^{n_u} \rightarrow \mathbb{R}$ and $\eta_N \vcentcolon \mathbb{R}^{n_{\sigma}} \rightarrow \mathbb{R}$, and will be penalized by the time-varying matrices $W(\epsilon_i^\star), {W}_N(\epsilon_i^\star) \succ 0$, respectively. The output variables $\Tilde{\eta} \vcentcolon \mathbb{R}^{n_{\sigma}} \times \mathbb{R}^{n_u} \rightarrow \mathbb{R}$ and $\Tilde{\eta}_N \vcentcolon \mathbb{R}^{n_{\sigma}} \rightarrow \mathbb{R}$ represent the time-varying references coming from both global planner (offline) and human inputs (online). Notice that $W(\epsilon_i^\star)$ and ${W}_N(\epsilon_i^\star)$ depend on the predicted Euclidean distance ($\epsilon^\star_i$), which we will introduce in the next section, using the prediction model in the low-level NMPC. Accounting for reciprocal feasibility between controllers, the remaining constraints in (\textbf{NLP$_2$}) are kept the same as in (\textbf{NLP$_1$}). 
